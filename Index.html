@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vintage Shift Log & Hours Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-paper: #f4ebd9;
+      --card-paper: #fdf8ec;
+      --ink-primary: #2b2521;
+      --ink-muted: #6e6459;
+      --accent-brass: #b8860b;
+      --accent-leather: #8b4513;
+      --accent-red: #a03c2e;
+      --accent-green: #3a6b4c;
+      --border-color: #d7c9b1;
+      --shadow-vintage: 4px 4px 0px rgba(43, 37, 33, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: 'Courier Prime', monospace;
+      padding: 2rem;
+      min-height: 100vh;
+      background-image: radial-gradient(rgba(139, 69, 19, 0.05) 1px, transparent 0);
+      background-size: 20px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 3px double var(--accent-leather);
+      padding-bottom: 1rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--accent-leather);
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: var(--ink-muted);
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+
+    /* Dashboard Summary Cards */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--card-paper);
+      border: 2px solid var(--ink-primary);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-vintage);
+      position: relative;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
+      border: 1px dashed var(--border-color);
+      pointer-events: none;
+    }
+
+    .stat-card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent-leather);
+    }
+
+    .stat-card .subtext {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Entry Form */
+    .form-section {
+      background: var(--card-paper);
+      border: 2px solid var(--ink-primary);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-vintage);
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--ink-primary);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .table-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .table-header-flex .section-title {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--ink-primary);
+    }
+
+    input, select {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.95rem;
+      padding: 0.6rem;
+      background: var(--bg-paper);
+      border: 1px solid var(--ink-primary);
+      color: var(--ink-primary);
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent-brass);
+      background: #fff;
+    }
+
+    button {
+      font-family: 'Courier Prime', monospace;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: var(--accent-leather);
+      color: var(--card-paper);
+      border: 2px solid var(--ink-primary);
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--ink-primary);
+      transition: all 0.1s ease;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: var(--accent-brass);
+      color: var(--ink-primary);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--ink-primary);
+    }
+
+    button:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--ink-primary);
+    }
+
+    .btn-export {
+      background: var(--accent-green);
+      margin-top: 0;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-export:hover {
+      background: #2b4e37;
+      color: #fff;
+    }
+
+    /* Shift Table */
+    .table-container {
+      background: var(--card-paper);
+      border: 2px solid var(--ink-primary);
+      box-shadow: var(--shadow-vintage);
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      border-bottom: 2px solid var(--ink-primary);
+      padding: 0.75rem;
+      color: var(--accent-leather);
+    }
+
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px dashed var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    .btn-delete {
+      background: var(--accent-red);
+      color: #fff;
+      border: none;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      box-shadow: none;
+      margin-top: 0;
+    }
+
+    .btn-delete:hover {
+      background: #70261b;
+      color: #fff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      header h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Shift Logbook</h1>
+      <p>Official Timekeeping & Hours Ledger</p>
+    </header>
+
+    <!-- Summary Section -->
+    <div class="dashboard">
+      <div class="stat-card">
+        <h3>This Week's Total</h3>
+        <div class="value" id="weekly-total">0.00 hrs</div>
+        <div class="subtext">Mon – Sun current week</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>This Month's Total</h3>
+        <div class="value" id="monthly-total">0.00 hrs</div>
+        <div class="subtext">Current calendar month</div>
+      </div>
+    </div>
+
+    <!-- Entry Form -->
+    <div class="form-section">
+      <h2 class="section-title">Log New Shift Entry</h2>
+      <form id="shift-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="shift-date">Shift Date</label>
+            <input type="date" id="shift-date" required>
+          </div>
+          <div class="form-group">
+            <label for="start-time">Start Time</label>
+            <input type="time" id="start-time" required>
+          </div>
+          <div class="form-group">
+            <label for="end-time">End Time</label>
+            <input type="time" id="end-time" required>
+          </div>
+          <div class="form-group">
+            <label for="break-mins">Unpaid Break (mins)</label>
+            <input type="number" id="break-mins" value="0" min="0" step="5">
+          </div>
+        </div>
+        <button type="submit">Record Entry into Ledger</button>
+      </form>
+    </div>
+
+    <!-- Shift Table -->
+    <div class="table-container">
+      <div class="table-header-flex">
+        <h2 class="section-title">Recorded Shift History</h2>
+        <button id="export-btn" class="btn-export">Export Ledger (CSV)</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Break</th>
+            <th>Total Hours</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="shift-table-body">
+          <!-- Entries populated dynamically -->
+        </tbody>
+      </table>
+      <div id="empty-notice" class="empty-state">No shifts logged yet. Use the form above to record your hours.</div>
+    </div>
+  </div>
+
+  <script>
+    // LocalStorage State Management
+    let shifts = JSON.parse(localStorage.getItem('vintage_shifts')) || [];
+
+    // Pre-fill date picker with today's date
+    document.getElementById('shift-date').value = new Date().toISOString().split('T')[0];
+
+    const form = document.getElementById('shift-form');
+    const tableBody = document.getElementById('shift-table-body');
+    const emptyNotice = document.getElementById('empty-notice');
+    const weeklyTotalEl = document.getElementById('weekly-total');
+    const monthlyTotalEl = document.getElementById('monthly-total');
+    const exportBtn = document.getElementById('export-btn');
+
+    // Helper: Calculate net worked hours between start and end time
+    function calculateHours(startDateStr, startTimeStr, endTimeStr, breakMinutes) {
+      const start = new Date(`${startDateStr}T${startTimeStr}`);
+      let end = new Date(`${startDateStr}T${endTimeStr}`);
+
+      // Handle overnight shifts (end time earlier than start time)
+      if (end < start) {
+        end.setDate(end.getDate() + 1);
+      }
+
+      const durationMs = end - start;
+      const totalMinutes = (durationMs / (1000 * 60)) - (parseInt(breakMinutes) || 0);
+      return Math.max(0, totalMinutes / 60);
+    }
+
+    // Helper: Determine if date is within current week (Monday through Sunday)
+    function isCurrentWeek(dateStr) {
+      const target = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      
+      const dayOfWeek = now.getDay() || 7; // Convert Sunday (0) to 7
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dayOfWeek + 1);
+      monday.setHours(0, 0, 0, 0);
+
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+
+      return target >= monday && target <= sunday;
+    }
+
+    // Helper: Determine if date is within current month
+    function isCurrentMonth(dateStr) {
+      const target = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      return target.getFullYear() === now.getFullYear() && target.getMonth() === now.getMonth();
+    }
+
+    // Recalculate Totals & Render Table
+    function updateUI() {
+      // Sort shifts by date descending
+      shifts.sort((a, b) => new Date(b.date + 'T' + b.start) - new Date(a.date + 'T' + a.start));
+
+      tableBody.innerHTML = '';
+
+      let weeklySum = 0;
+      let monthlySum = 0;
+
+      if (shifts.length === 0) {
+        emptyNotice.style.display = 'block';
+      } else {
+        emptyNotice.style.display = 'none';
+      }
+
+      shifts.forEach((shift, index) => {
+        const hours = calculateHours(shift.date, shift.start, shift.end, shift.breakMins);
+
+        if (isCurrentWeek(shift.date)) {
+          weeklySum += hours;
+        }
+        if (isCurrentMonth(shift.date)) {
+          monthlySum += hours;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${shift.date}</strong></td>
+          <td>${shift.start}</td>
+          <td>${shift.end}</td>
+          <td>${shift.breakMins} mins</td>
+          <td><strong>${hours.toFixed(2)} hrs</strong></td>
+          <td><button class="btn-delete" onclick="deleteShift(${index})">Remove</button></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      weeklyTotalEl.textContent = `${weeklySum.toFixed(2)} hrs`;
+      monthlyTotalEl.textContent = `${monthlySum.toFixed(2)} hrs`;
+
+      localStorage.setItem('vintage_shifts', JSON.stringify(shifts));
+    }
+
+    // Add New Shift
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const newShift = {
+        date: document.getElementById('shift-date').value,
+        start: document.getElementById('start-time').value,
+        end: document.getElementById('end-time').value,
+        breakMins: document.getElementById('break-mins').value || 0
+      };
+
+      shifts.push(newShift);
+      updateUI();
+      form.reset();
+      document.getElementById('shift-date').value = new Date().toISOString().split('T')[0];
+    });
+
+    // Delete Shift
+    function deleteShift(index) {
+      shifts.splice(index, 1);
+      updateUI();
+    }
+
+    // Export Ledger Data to CSV File
+    exportBtn.addEventListener('click', () => {
+      if (shifts.length === 0) {
+        alert("No recorded shifts available to export.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Date,Start Time,End Time,Break (Mins),Total Hours\n";
+
+      shifts.forEach(shift => {
+        const hours = calculateHours(shift.date, shift.start, shift.end, shift.breakMins);
+        const row = `${shift.date},${shift.start},${shift.end},${shift.breakMins},${hours.toFixed(2)}`;
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Shift_Ledger_Export_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Initial Render
+    updateUI();
+  </script>
+</body>
+</html>
